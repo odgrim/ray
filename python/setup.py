@@ -20,7 +20,7 @@ from itertools import chain
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_PYTHONS = [(3, 6), (3, 7), (3, 8), (3, 9), (3, 10)]
+SUPPORTED_PYTHONS = [(3, 6), (3, 7), (3, 8), (3, 9), (3, 10), (3, 11)]
 # When the bazel version is updated, make sure to update it
 # in WORKSPACE file as well.
 
@@ -210,7 +210,10 @@ ray_files += [
 # also update the matching section of requirements/requirements.txt
 # in this directory
 if setup_spec.type == SetupType.RAY:
-    if sys.version_info >= (3, 7):
+    if sys.version_info >= (3, 11):
+        pandas_dep = "pandas >= 1.5"
+        numpy_dep = "numpy >= 1.23.4"
+    elif sys.version_info >= (3, 7):
         pandas_dep = "pandas >= 1.3"
         numpy_dep = "numpy >= 1.20"
     else:
@@ -240,7 +243,7 @@ if setup_spec.type == SetupType.RAY:
             "smart_open",
         ],
         "serve": ["uvicorn", "requests", "starlette", "fastapi", "aiorwlock"],
-        "tune": ["pandas", "tabulate", "tensorboardX>=1.9", "requests"],
+        "tune": [pandas_dep, "tabulate", "tensorboardX>=1.9", "requests"],
         "k8s": ["kubernetes", "urllib3"],
         "observability": [
             "opentelemetry-api==1.1.0",
@@ -309,6 +312,7 @@ if setup_spec.type == SetupType.RAY:
         "msgpack >= 1.0.0, < 2.0.0",
         "numpy >= 1.16; python_version < '3.9'",
         "numpy >= 1.19.3; python_version >= '3.9'",
+        "numpy >= 1.23.4; python_version >= '3.11'",
         "packaging; python_version >= '3.10'",
         "protobuf >= 3.15.3, != 3.19.5",
         "pyyaml",
@@ -773,7 +777,7 @@ setuptools.setup(
     # The BinaryDistribution argument triggers build_ext.
     distclass=BinaryDistribution,
     install_requires=setup_spec.install_requires,
-    setup_requires=["cython >= 0.29.26", "wheel"],
+    setup_requires=["cython >= 0.29.32", "wheel"],
     extras_require=setup_spec.extras,
     entry_points={
         "console_scripts": [
